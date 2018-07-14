@@ -63,7 +63,7 @@
 /*
  *  デフォルトの非タスクコンテキスト用のスタック領域の定義
  */
-#define DEFAULT_ISTKSZ			(0x1000)		/* 4KByte */
+#define DEFAULT_ISTKSZ			(0x400)		/* 1KByte */
 
 /*
  *  微少時間待ちのための定義（本来はSILのターゲット依存部）
