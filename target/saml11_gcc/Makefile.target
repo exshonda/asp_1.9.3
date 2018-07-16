@@ -111,9 +111,10 @@ LDFLAGS := $(LDFLAGS) -l:libsecure_gateway_veneer.lib -L"$(TZSDIR)\Debug"
 else
 COPTS := $(COPTS) -mcmse
 LDSCRIPT = $(TARGETDIR)/lib/Device_Startup/saml11_secure.ld
-INCLUDES :=  $(INCLUDES) -I"$(ATMELLIBDIR)\trustzone"
+INCLUDES :=  $(INCLUDES) -I"$(ATMELLIBDIR)\trustzone" 
+KERNEL_DIR := $(KERNEL_DIR) $(ATMELLIBDIR)/trustzone/
+SYSSVC_COBJS := $(SYSSVC_COBJS) trustzone_manager.o
 endif
-
 
 #
 #  スタートアップモジュールに関する定義
