@@ -87,14 +87,28 @@ software_term_hook(void)
 
 }
 
+#include "saml11e16a.h"
+
+/*
+ * ベクターベースアドレス
+ */
+extern uint32_t _sfixed;
+
 /*
  *  ターゲット依存の初期化
  */
 void
 target_initialize(void)
 {
+	/*
+	 *  ベクターオフセットの初期化
+	 */
+	SCB->VTOR = ((uint32_t) (&_sfixed) & SCB_VTOR_TBLOFF_Msk);
+
+#if (defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U))
 	init_mcu();
 	trustzone_manager_init();
+#endif
 
 	/*
 	 *  target_fput_logが使えるようにUARTを初期化

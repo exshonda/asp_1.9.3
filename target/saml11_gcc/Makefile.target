@@ -47,9 +47,8 @@ INCLUDES :=  $(INCLUDES) -I$(TARGETDIR) \
             -I"$(ATMELLIBDIR)\hal\utils\include" \
             -I"$(ATMELLIBDIR)\hpl\port" \
             -I"$(ATMELLIBDIR)\hpl\gclk" \
-            -I"$(ATMELLIBDIR)\trustzone" \
             -I"$(ATMELLIBDIR)\Config"
-COPTS := $(COPTS) -mcmse
+COPTS := $(COPTS)
 LDFLAGS := $(LDFLAGS) -mcpu=cortex-m23
 CDEFS := $(CDEFS) -D__SAML11E16A__
 CFG1_OUT_LDFLAGS := -nostdlib $(CFG1_OUT_LDFLAGS)
@@ -103,7 +102,18 @@ GCC_TARGET = arm-none-eabi
 #
 #  リンカスクリプトの定義
 #
+ifeq ($(NON_SECURE),true)
+TZSDIR = $(TARGETDIR)/tz_solution/TZ-Secure
+CDEFS := $(CDEFS) -DINIT_MSP
+LDSCRIPT = $(TARGETDIR)/tz_solution/TZ-Secure/Device_Startup/saml11_nonsecure.ld
+INCLUDES :=  $(INCLUDES) -I"$(TZSDIR)\trustzone"
+LDFLAGS := $(LDFLAGS) -l:libsecure_gateway_veneer.lib -L"$(TZSDIR)\Debug"
+else
+COPTS := $(COPTS) -mcmse
 LDSCRIPT = $(TARGETDIR)/lib/Device_Startup/saml11_secure.ld
+INCLUDES :=  $(INCLUDES) -I"$(ATMELLIBDIR)\trustzone"
+endif
+
 
 #
 #  スタートアップモジュールに関する定義
