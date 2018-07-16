@@ -1,6 +1,6 @@
 =====================================================================
                            SAM L11 ターゲット依存部
-                                  Last Modified:2018 Jul 14 11:39:21
+                                  Last Modified:2018 Jul 16 22:58:04
 =====================================================================
 
 ○概要
@@ -112,6 +112,79 @@ Use GDB のチェックを外す
 
 ・クロック
   ・内蔵16Mhzをコア及び周辺回路に使用．
+
+
+○NonSecureでの実行
+
+NonSecureで実行するためのAtmelStudioのソリューションとして，
+
+./tz_solution
+
+を用意している．このソリューションには2個のプロジェクトが含まれている．
+
+TZ-Secure
+Secure側で動作するプログラムのプロジェクト．Atmel Studioで 
+TZ-SecureDriver-S をベースに以下の点を変更して生成したプロジェクト．
+
+TrustZoneManager
+ BOOTPROT = 0
+ AS   = 0x40
+ ANSC = 0x04
+ RS   = 0x10
+
+ SecureDriverExampleのveneerを生成しないようにする．
+
+OSCCTRL
+・16Mhz INTERNAL OSCI... の出力クロックを16Mhzとする．
+
+TZ-NonSecure
+Non-Secure側で動作するプログラムのプロジェクト．
+ASPカーネルをビルドする．
+
+●メモリの設定
+
+メモリ設定は次の通りである．
+
+Secure
+ ROM : 16KB(内 NSC 128byte)
+ RAM : 2KB
+
+Non-Secure
+ ROM : 48KB 
+ RAM : 14KB
+
+●ビルド
+
+ビルドはTZ-Secureをまずビルドし，次にTZ-NonSecure側をビルドする．
+
+●実行
+
+通常にダウンロードと実行することにより，まずTZ-Secureのプログラムがが
+実行され，初期化終了後に，NonSecureに移行してASPが実行される．
+
+
+●NSC関数の作成
+
+NonSecure側からSecre側の機能を呼び出し可能な関数の作成方法は次の通りで
+ある．
+
+Secure側
+
+trustzone/trustzone_veneer.h 
+・extern宣言を記載する．
+
+trustzone/trustzone_veneer.c
+
+アトリビュートを付けて関数を定義
+
+int32_t __attribute__((cmse_nonsecure_entry)) nsc_ext_irq_init(struct ext_irq_setting irq_setting) {
+
+}
+
+Non-Secure側
+・trustzone/trustzone_veneer.h をインクルード
+・Secure側で定義した関数を呼び出す．
+
 
 ○変更履歴
 
